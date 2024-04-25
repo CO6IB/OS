@@ -1,0 +1,5 @@
+# Display current logged-in user
+whoami
+
+# Display log name
+logname
