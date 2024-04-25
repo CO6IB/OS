@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        fprintf(stderr, "Fork failed.\n");
+        return 1;
+    } else if (pid == 0) {
+        // Child process
+        printf("Child process is running...\n");
+        sleep(2);  // Simulate some work
+        printf("Child process is terminating.\n");
+        exit(0);
+    } else {
+        // Parent process
+        printf("Parent process is waiting for child to terminate...\n");
+        int status;
+        wait(&status); // Wait for any child process to terminate
+        printf("Parent process: Child terminated.\n");
+    }
+
+    return 0;
+}
