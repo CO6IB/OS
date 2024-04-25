@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_PROCESSES 5
+#define MAX_RESOURCES 3
+
+int allocation[MAX_PROCESSES][MAX_RESOURCES];
+int max_demand[MAX_PROCESSES][MAX_RESOURCES];
+int available[MAX_RESOURCES];
+int need[MAX_PROCESSES][MAX_RESOURCES];
+
+bool finish[MAX_PROCESSES] = {false};
+int work[MAX_RESOURCES];
+
+// Function to calculate the need matrix
+void calculate_need() {
+    for (int i = 0; i < MAX_PROCESSES; ++i) {
+        for (int j = 0; j < MAX_RESOURCES; ++j) {
+            need[i][j] = max_demand[i][j] - allocation[i][j];
+        }
+    }
+}
+
+// Function to check if the current state is safe
+bool is_safe_state(int process) {
+    for (int i = 0; i < MAX_RESOURCES; ++i) {
+        if (need[process][i] > work[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Function to apply Banker's algorithm
+bool banker_algorithm() {
+    int safe_sequence[MAX_PROCESSES];
+    int safe_count = 0;
+
+    for (int i = 0; i < MAX_RESOURCES; ++i) {
+        work[i] = available[i];
+    }
+
+    while (safe_count < MAX_PROCESSES) {
+        bool found = false;
+        for (int i = 0; i < MAX_PROCESSES; ++i) {
+            if (!finish[i] && is_safe_state(i)) {
+                found = true;
+                safe_sequence[safe_count++] = i;
+                for (int j = 0; j < MAX_RESOURCES; ++j) {
+                    work[j] += allocation[i][j];
+                }
+                finish[i] = true;
+                break;
+            }
+        }
+        if (!found) {
+            printf("Unsafe state detected!\n");
+            return false;
+        }
+    }
+
+    printf("Safe sequence: ");
+    for (int i = 0; i < MAX_PROCESSES; ++i) {
+        printf("%d ", safe_sequence[i]);
+    }
+    printf("\n");
+
+    return true;
+}
+
+// Example usage
+int main() {
+    // Initialize allocation, max_demand, and available arrays
+    int allocation_matrix[MAX_PROCESSES][MAX_RESOURCES] = {
+        {0, 1, 0},
+        {2, 0, 0},
+        {3, 0, 2},
+        {2, 1, 1},
+        {0, 0, 2}
+    };
+
+    int max_demand_matrix[MAX_PROCESSES][MAX_RESOURCES] = {
+        {7, 5, 3},
+        {3, 2, 2},
+        {9, 0, 2},
+        {2, 2, 2},
+        {4, 3, 3}
+    };
+
+    int available_resources[MAX_RESOURCES] = {3, 3, 2};
+
+    // Copy matrices to global arrays
+    for (int i = 0; i < MAX_PROCESSES; ++i) {
+        for (int j = 0; j < MAX_RESOURCES; ++j) {
+            allocation[i][j] = allocation_matrix[i][j];
+            max_demand[i][j] = max_demand_matrix[i][j];
+        }
+    }
+
+    for (int i = 0; i < MAX_RESOURCES; ++i) {
+        available[i] = available_resources[i];
+    }
+
+    // Calculate need matrix
+    calculate_need();
+
+    // Apply Banker's algorithm
+    banker_algorithm();
+
+    return 0;
+}
