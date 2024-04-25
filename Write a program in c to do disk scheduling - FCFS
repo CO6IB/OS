@@ -1,0 +1,29 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+void fcfs(int arr[], int head, int size) {
+    int seek_count = 0;
+    int distance;
+    for (int i = 0; i < size; ++i) {
+        distance = abs(arr[i] - head); // Calculate seek distance
+        seek_count += distance; // Accumulate seek distances
+        head = arr[i]; // Move head to the next request
+    }
+    printf("Total seek time: %d\n", seek_count);
+}
+
+int main() {
+    int size, head;
+    printf("Enter the number of requests: ");
+    scanf("%d", &size);
+    printf("Enter the request queue:\n");
+    int *requests = (int *)malloc(size * sizeof(int));
+    for (int i = 0; i < size; ++i) {
+        scanf("%d", &requests[i]);
+    }
+    printf("Enter the initial position of the head: ");
+    scanf("%d", &head);
+    fcfs(requests, head, size);
+    free(requests);
+    return 0;
+}
